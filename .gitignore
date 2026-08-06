@@ -2,3 +2,8 @@
 .env.*
 !.env.example
 .DS_Store
+
+# Local LiveKit Server binaries
+livekit-server
+livekit-server.exe
+
