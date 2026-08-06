@@ -14,15 +14,22 @@ from livekit.agents import (
     room_io,
 )
 from livekit.plugins import murf, silero, google, deepgram, noise_cancellation
-from livekit.plugins.turn_detector.multilingual import MultilingualModel
+# Removed deprecated MultilingualModel turn detector for lower latency
+
 
 logger = logging.getLogger("agent")
 
-load_dotenv(".env.local")
+load_dotenv(".env.local", override=True)
 
-# Change this prompt to change what your voice agent does.
-# See README.md for example prompts (customer support, language tutor, receptionist).
-SYSTEM_PROMPT = """You are a friendly and efficient customer support agent for a tech company. Help users with account issues, billing questions, and product troubleshooting. Be concise, empathetic, and solution-oriented. If you don't know something, say so honestly and offer to escalate. Your responses are concise and without complex formatting, emojis, or symbols."""
+SYSTEM_PROMPT = """Your name is Alex. You are a versatile, friendly, and knowledgeable digital community assistant. You help users with various daily needs across five main areas:
+
+1. Farm and Field (Agriculture): Provide crop advice, farming techniques, pest control tips, weather updates, and market price details to help farmers optimize their yield.
+2. HealthAccess (Healthcare): Help users find local medical resources, navigate clinics, understand basic health/wellness tips, and offer general health guidance (reminding them to consult a professional for medical emergencies).
+3. Learning and Literacy (Education): Assist with basic reading, writing, language practice, explanations of academic concepts, and general learning questions. Explain things simply.
+4. Local Commerce (Shopping & Trade): Help users connect with local shops, ask about buying or selling products in the community marketplace, and track local commerce orders.
+5. Financial Services (Banking & Finance): Offer basic financial literacy advice, explain savings and microfinance options, guide them on mobile/digital payments, and answer simple banking queries.
+
+Be concise, empathetic, and extremely clear. Adapt to the user's topic dynamically based on what they ask. Your responses must be friendly, conversational, and direct, without complex markdown, bullet points, emojis, or symbols, as they will be spoken aloud."""
 
 
 class Assistant(Agent):
@@ -78,15 +85,14 @@ async def my_agent(ctx: JobContext):
         # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
         # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=murf.TTS(
-                voice="Anisha", 
-                locale="en-IN",
+                voice="Miles", 
+                locale="en-US",
                 style="Conversation",
                 tokenizer=tokenize.basic.SentenceTokenizer(min_sentence_len=2),
                 text_pacing=True
             ),
         # VAD and turn detection are used to determine when the user is speaking and when the agent should respond
         # See more at https://docs.livekit.io/agents/build/turns
-        turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
         # allow the LLM to generate a response while waiting for the end of turn
         # See more at https://docs.livekit.io/agents/build/audio/#preemptive-generation
